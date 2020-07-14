@@ -13,6 +13,7 @@
 // }
 
 import 'package:dartz/dartz.dart';
+import 'package:injectable/injectable.dart';
 import 'package:mobx/mobx.dart';
 import 'package:notes_firebase_DDD_course/application/auth/sign_in_form/usecases/register_with_email_and_password.dart';
 import 'package:notes_firebase_DDD_course/application/auth/sign_in_form/usecases/signIn_with_email_and_password.dart';
@@ -23,6 +24,7 @@ import 'package:notes_firebase_DDD_course/domain/auth/value_objects.dart';
 import 'core/email_password_params.dart';
 part 'sign_in_form_view_model.g.dart';
 
+@injectable
 class SignInFormViewModel = _SignInFormViewModelBase with _$SignInFormViewModel;
 
 abstract class _SignInFormViewModelBase with Store {
@@ -38,22 +40,24 @@ abstract class _SignInFormViewModelBase with Store {
 
   @observable
   EmailAddress _emailAddress = EmailAddress('');
-
   @action
-  void setEmailAddress(EmailAddress value) {
-    _emailAddress = value;
+  void setEmailAddress(String value) {
+    _emailAddress = EmailAddress(value);
     _authFailureOrSuccess = none();
   }
 
+  @computed
   EmailAddress get emailAddress => _emailAddress;
 
   @observable
   Password _password = Password('');
-  void setPassword(Password value) {
-    _password = value;
+  @action
+  void setPassword(String value) {
+    _password = Password(value);
     _authFailureOrSuccess = none();
   }
 
+  @computed
   Password get password => _password;
 
   @observable
@@ -66,17 +70,22 @@ abstract class _SignInFormViewModelBase with Store {
 
   @observable
   Option<Either<AuthFailure, Unit>> _authFailureOrSuccess = none();
+  @computed
+  Option<Either<AuthFailure, Unit>> get authFailureOrSuccess =>
+      _authFailureOrSuccess;
 
   @action
   Future<void> registerWithEmailAndPasswordPressed() async {
     await _performActionOnAuthFacadeWithEmailAndPassword(
-        _registerWithEmailAndPassword);
+      _registerWithEmailAndPassword,
+    );
   }
 
   @action
   Future<void> signInWithEmailAndPasswordPressed() async {
     await _performActionOnAuthFacadeWithEmailAndPassword(
-        _signInWithEmailAndPassword);
+      _signInWithEmailAndPassword,
+    );
   }
 
   Future<void> _performActionOnAuthFacadeWithEmailAndPassword(
@@ -91,6 +100,8 @@ abstract class _SignInFormViewModelBase with Store {
     _isSubmitting = false;
     if (failureOrSuccess.isLeft()) {
       _showErrorMessage = true;
+    } else {
+      _showErrorMessage = false;
     }
     _authFailureOrSuccess = optionOf(failureOrSuccess);
   }
@@ -99,7 +110,7 @@ abstract class _SignInFormViewModelBase with Store {
   Future<void> signInWithGooglePressed() async {
     _isSubmitting = true;
     _authFailureOrSuccess = none();
-    final failureOrSuccess = await _signInWithGoogle();
+    final failureOrSuccess = await _signInWithGoogle.call();
     _isSubmitting = false;
     _authFailureOrSuccess = some(failureOrSuccess);
   }

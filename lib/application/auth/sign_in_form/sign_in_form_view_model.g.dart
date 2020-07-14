@@ -9,6 +9,30 @@ part of 'sign_in_form_view_model.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$SignInFormViewModel on _SignInFormViewModelBase, Store {
+  Computed<EmailAddress> _$emailAddressComputed;
+
+  @override
+  EmailAddress get emailAddress => (_$emailAddressComputed ??=
+          Computed<EmailAddress>(() => super.emailAddress,
+              name: '_SignInFormViewModelBase.emailAddress'))
+      .value;
+  Computed<Password> _$passwordComputed;
+
+  @override
+  Password get password =>
+      (_$passwordComputed ??= Computed<Password>(() => super.password,
+              name: '_SignInFormViewModelBase.password'))
+          .value;
+  Computed<Option<Either<AuthFailure, Unit>>> _$authFailureOrSuccessComputed;
+
+  @override
+  Option<Either<AuthFailure, Unit>> get authFailureOrSuccess =>
+      (_$authFailureOrSuccessComputed ??=
+              Computed<Option<Either<AuthFailure, Unit>>>(
+                  () => super.authFailureOrSuccess,
+                  name: '_SignInFormViewModelBase.authFailureOrSuccess'))
+          .value;
+
   final _$_emailAddressAtom =
       Atom(name: '_SignInFormViewModelBase._emailAddress');
 
@@ -120,7 +144,7 @@ mixin _$SignInFormViewModel on _SignInFormViewModelBase, Store {
       ActionController(name: '_SignInFormViewModelBase');
 
   @override
-  void setEmailAddress(EmailAddress value) {
+  void setEmailAddress(String value) {
     final _$actionInfo = _$_SignInFormViewModelBaseActionController.startAction(
         name: '_SignInFormViewModelBase.setEmailAddress');
     try {
@@ -131,9 +155,22 @@ mixin _$SignInFormViewModel on _SignInFormViewModelBase, Store {
   }
 
   @override
+  void setPassword(String value) {
+    final _$actionInfo = _$_SignInFormViewModelBaseActionController.startAction(
+        name: '_SignInFormViewModelBase.setPassword');
+    try {
+      return super.setPassword(value);
+    } finally {
+      _$_SignInFormViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
-
+emailAddress: ${emailAddress},
+password: ${password},
+authFailureOrSuccess: ${authFailureOrSuccess}
     ''';
   }
 }
